@@ -6,7 +6,8 @@ import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { encodeRgb } from '../tools/png.mjs';
+import { deflateSync } from 'node:zlib';
+import { chunk, encodeRgb, PNG_SIGNATURE } from '../tools/png.mjs';
 import { checkImage } from '../tools/verify.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -55,6 +56,24 @@ test('main.ts accepts a small valid PNG and refuses corrupt, oversize or empty o
   assert.equal(runWithImage(encodeRgb(1025, 1, Buffer.alloc(1025 * 3, 1))), false);
   assert.equal(runWithImage(encodeRgb(0, 0, Buffer.alloc(0))), false);
   assert.equal(runWithImage(good.subarray(0, good.length - 12)), false);
+});
+
+/** A 2x2 RGB PNG built chunk by chunk, so a test can break one part of it. */
+function handBuilt({ filter = 0, extra = [], iendData = Buffer.alloc(0) } = {}) {
+  const ihdr = Buffer.from([0, 0, 0, 2, 0, 0, 0, 2, 8, 2, 0, 0, 0]);
+  const row = Buffer.from([filter, 10, 20, 30, 40, 50, 60]);
+  const idat = deflateSync(Buffer.concat([row, row]));
+  return Buffer.concat([PNG_SIGNATURE, chunk('IHDR', ihdr), ...extra, chunk('IDAT', idat), chunk('IEND', iendData)]);
+}
+
+test('main.ts refuses malformed chunk streams and bad filter bytes', () => {
+  assert.equal(runWithImage(handBuilt()), true);
+  assert.equal(runWithImage(handBuilt({ filter: 7 })), false);
+  assert.equal(runWithImage(handBuilt({ iendData: Buffer.from([1]) })), false);
+  const ihdr = Buffer.from([0, 0, 0, 2, 0, 0, 0, 2, 8, 2, 0, 0, 0]);
+  assert.equal(runWithImage(handBuilt({ extra: [chunk('IHDR', ihdr)] })), false);
+  assert.equal(runWithImage(handBuilt({ extra: [chunk('ABCD', Buffer.alloc(0))] })), false);
+  assert.equal(runWithImage(handBuilt({ extra: [chunk('tEXt', Buffer.from('Title\0ok'))] })), true);
 });
 
 test('checkImage flags an image with no pixels', () => {

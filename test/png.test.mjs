@@ -1,7 +1,7 @@
 // Unit tests for the PNG tools: run with  node --test
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { crc32, decode, encodePalette, encodeRgb, exactPalette, readChunks } from '../tools/png.mjs';
+import { chunk, crc32, decode, encodePalette, encodeRgb, exactPalette, readChunks } from '../tools/png.mjs';
 import { downscale } from '../tools/preview.mjs';
 import { checkImage } from '../tools/verify.mjs';
 
@@ -38,6 +38,16 @@ test('a palette image survives encode then decode unchanged', () => {
   const { indices, palette } = exactPalette(rgb);
   assert.equal(palette.length, 6);
   assert.deepEqual(decode(encodePalette(8, 4, indices, palette)).rgb, rgb);
+});
+
+test('decode refuses a malformed palette and a tRNS chunk', () => {
+  const good = encodePalette(2, 1, Buffer.from([0, 1]), Buffer.from([1, 2, 3, 4, 5, 6]));
+  const parts = readChunks(good);
+  const rebuild = (list) => Buffer.concat([good.subarray(0, 8), ...list.map((c) => chunk(c.type, c.data))]);
+  const shortPalette = parts.map((c) => (c.type === 'PLTE' ? { type: 'PLTE', data: Buffer.from([1, 2, 3, 4]) } : c));
+  assert.throws(() => decode(rebuild(shortPalette)), /PLTE/);
+  const withTrns = [parts[0], parts[1], { type: 'tRNS', data: Buffer.from([0]) }, ...parts.slice(2)];
+  assert.throws(() => decode(rebuild(withTrns)), /tRNS/);
 });
 
 test('exactPalette gives up past 256 colours', () => {

@@ -104,6 +104,9 @@ export function decode(file) {
   if (!bpp) throw new Error(`colour type ${colorType} is invalid`);
   const palette = chunks.find((c) => c.type === 'PLTE')?.data;
   if (colorType === 3 && !palette) throw new Error('palette image without PLTE');
+  if (palette && (palette.length % 3 !== 0 || palette.length < 3 || palette.length > 768)) {
+    throw new Error(`PLTE of ${palette.length} bytes is malformed`);
+  }
   if (chunks.some((c) => c.type === 'tRNS')) throw new Error('tRNS transparency is not supported here');
   if (width < 1 || height < 1) throw new Error(`image is ${width}x${height}`);
   const idat = Buffer.concat(chunks.filter((c) => c.type === 'IDAT').map((c) => c.data));
@@ -133,7 +136,8 @@ export function decode(file) {
   return { width, height, rgb };
 }
 
-function chunk(type, data) {
+/** One PNG chunk: length, type, data and CRC (exported so the tests can build malformed files). */
+export function chunk(type, data) {
   const head = Buffer.alloc(8);
   head.writeUInt32BE(data.length, 0);
   head.write(type, 4, 'latin1');
