@@ -59,10 +59,10 @@ test('main.ts accepts a small valid PNG and refuses corrupt, oversize or empty o
 });
 
 /** A 2x2 RGB PNG built chunk by chunk, so a test can break one part of it. */
-function handBuilt({ filter = 0, extra = [], iendData = Buffer.alloc(0) } = {}) {
+function handBuilt({ filter = 0, extra = [], iendData = Buffer.alloc(0), trailing = Buffer.alloc(0) } = {}) {
   const ihdr = Buffer.from([0, 0, 0, 2, 0, 0, 0, 2, 8, 2, 0, 0, 0]);
   const row = Buffer.from([filter, 10, 20, 30, 40, 50, 60]);
-  const idat = deflateSync(Buffer.concat([row, row]));
+  const idat = Buffer.concat([deflateSync(Buffer.concat([row, row])), trailing]);
   return Buffer.concat([PNG_SIGNATURE, chunk('IHDR', ihdr), ...extra, chunk('IDAT', idat), chunk('IEND', iendData)]);
 }
 
@@ -74,6 +74,8 @@ test('main.ts refuses malformed chunk streams and bad filter bytes', () => {
   assert.equal(runWithImage(handBuilt({ extra: [chunk('IHDR', ihdr)] })), false);
   assert.equal(runWithImage(handBuilt({ extra: [chunk('ABCD', Buffer.alloc(0))] })), false);
   assert.equal(runWithImage(handBuilt({ extra: [chunk('tEXt', Buffer.from('Title\0ok'))] })), true);
+  assert.equal(runWithImage(handBuilt({ trailing: Buffer.from([1, 2, 3]) })), false);
+  assert.equal(checkImage(handBuilt({ trailing: Buffer.from([1, 2, 3]) })).problems.length > 0, true);
 });
 
 test('checkImage flags an image with no pixels', () => {

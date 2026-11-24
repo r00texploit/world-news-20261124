@@ -70,9 +70,12 @@ function assertGateLimits(image: Buffer): void {
   const channels = CHANNELS[header[9]];
   if (width < 1 || height < 1 || width > MAX_SIDE || height > MAX_SIDE) fail(`${width}x${height} pixels`);
   if (header[8] !== 8 || header[12] !== 0 || channels === undefined) fail('not an 8-bit non-interlaced PNG');
+  if (header[10] !== 0 || header[11] !== 0) fail('unknown compression or filter method');
   if (header[9] === 3 && !hasPalette) fail('palette image without PLTE');
   const stride = 1 + width * channels;
-  const rows = inflateSync(idat);
+  const inflated = inflateSync(idat, { info: true }) as unknown as { buffer: Buffer; engine: { bytesWritten: number } };
+  const rows = inflated.buffer;
+  if (inflated.engine.bytesWritten !== idat.length) fail('stray bytes after the compressed image data');
   if (rows.length !== height * stride) fail('image data is incomplete');
   for (let y = 0; y < height; y += 1) if (rows[y * stride] > 4) fail(`row ${y} has filter type ${rows[y * stride]}`);
 }

@@ -41,7 +41,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   const width = Number(process.argv[2] ?? 300);
   if (!Number.isInteger(width) || width < 1 || width > 4096) throw new Error(`width must be an integer from 1 to 4096, got ${process.argv[2]}`);
   const { width: sw, height: sh, rgb } = decode(readFileSync(join(ROOT, 'entry.png')));
-  const height = Math.round((sh / sw) * width);
+  const height = Math.max(1, Math.round((sh / sw) * width));
   const out = join(ROOT, 'build', `preview-${width}.png`);
   mkdirSync(dirname(out), { recursive: true });
   writeFileSync(out, encodeRgb(width, height, downscale(rgb, sw, sh, width, height)));

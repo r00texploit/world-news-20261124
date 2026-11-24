@@ -26,16 +26,23 @@ export function readChunks(file) {
   if (file.length < 8 || !file.subarray(0, 8).equals(PNG_SIGNATURE)) throw new Error('not a PNG: bad signature');
   const chunks = [];
   let at = 8;
+  let idatState = 'before';
   while (at < file.length) {
     if (at + 12 > file.length) throw new Error(`truncated chunk header at byte ${at}`);
     const length = file.readUInt32BE(at);
     const type = file.toString('latin1', at + 4, at + 8);
     const end = at + 12 + length;
     if (end > file.length) throw new Error(`chunk ${type} runs past the end of the file`);
+    if (!/^[A-Za-z]{4}$/.test(type)) throw new Error(`illegal chunk type at byte ${at}`);
     const data = file.subarray(at + 8, at + 8 + length);
     const stored = file.readUInt32BE(at + 8 + length);
     const actual = crc32(file.subarray(at + 4, at + 8 + length));
     if (stored !== actual) throw new Error(`chunk ${type} has a bad CRC`);
+    if (type === 'IHDR' && chunks.length > 0) throw new Error('a second IHDR chunk');
+    if (type[0] <= 'Z' && !['IHDR', 'PLTE', 'IDAT', 'IEND'].includes(type)) throw new Error(`unknown critical chunk ${type}`);
+    if (type === 'IDAT' && idatState === 'after') throw new Error('IDAT chunks are not consecutive');
+    idatState = type === 'IDAT' ? 'inside' : idatState === 'inside' ? 'after' : idatState;
+    if (type === 'IEND' && length !== 0) throw new Error('IEND is not empty');
     chunks.push({ type, data });
     at = end;
     if (type === 'IEND') break;
@@ -109,8 +116,11 @@ export function decode(file) {
   }
   if (chunks.some((c) => c.type === 'tRNS')) throw new Error('tRNS transparency is not supported here');
   if (width < 1 || height < 1) throw new Error(`image is ${width}x${height}`);
+  if (chunks[0].data[10] !== 0 || chunks[0].data[11] !== 0) throw new Error('unknown compression or filter method');
   const idat = Buffer.concat(chunks.filter((c) => c.type === 'IDAT').map((c) => c.data));
-  const pixels = unfilter(inflateSync(idat), width, height, bpp);
+  const inflated = inflateSync(idat, { info: true });
+  if (inflated.engine.bytesWritten !== idat.length) throw new Error('stray bytes after the compressed image data');
+  const pixels = unfilter(inflated.buffer, width, height, bpp);
   const rgb = Buffer.alloc(width * height * 3);
   for (let i = 0; i < width * height; i += 1) {
     let r;
@@ -194,12 +204,15 @@ function header(width, height, colorType) {
 
 /** Encodes 8-bit RGB pixels as a PNG with no ancillary chunks, so equal pixels give equal bytes. */
 export function encodeRgb(width, height, rgb) {
+  if (rgb.length !== width * height * 3) throw new Error(`expected ${width * height * 3} RGB bytes, got ${rgb.length}`);
   const idat = deflateSync(filterRows(rgb, width, height, 3), { level: 9, memLevel: 9 });
   return Buffer.concat([PNG_SIGNATURE, header(width, height, 2), chunk('IDAT', idat), chunk('IEND', Buffer.alloc(0))]);
 }
 
 /** Encodes indexed pixels (one byte each) with an RGB palette; palette images take no row filter. */
 export function encodePalette(width, height, indices, paletteRgb) {
+  if (indices.length !== width * height) throw new Error(`expected ${width * height} indices, got ${indices.length}`);
+  if (paletteRgb.length % 3 !== 0 || paletteRgb.length < 3 || paletteRgb.length > 768) throw new Error('palette must hold 1 to 256 RGB entries');
   const stride = width;
   const raw = Buffer.alloc(height * (stride + 1));
   for (let y = 0; y < height; y += 1) indices.copy(raw, y * (stride + 1) + 1, y * stride, (y + 1) * stride);

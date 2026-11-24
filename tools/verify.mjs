@@ -34,24 +34,30 @@ export function checkImage(bytes) {
   return { header, problems };
 }
 
+/** Runs main.ts into outDir; returns its output, or the reason it failed (never throws). */
 function runEntry(outDir) {
   rmSync(outDir, { recursive: true, force: true });
   mkdirSync(outDir, { recursive: true });
-  // the flag is a no-op on Node 22.18+, where type stripping is on by default, and needed on 22.6 to 22.17
-  execFileSync(process.execPath, ['--experimental-strip-types', 'main.ts'], {
-    cwd: ROOT,
-    env: { ...process.env, MAKEFUN_OUTPUT_DIR: outDir },
-    stdio: ['ignore', 'pipe', 'pipe'],
-    timeout: 60_000,
-  });
-  return readFileSync(join(outDir, 'entry.png'));
+  try {
+    // the flag is a no-op on Node 22.18+, where type stripping is on by default, and needed on 22.6 to 22.17
+    execFileSync(process.execPath, ['--experimental-strip-types', 'main.ts'], {
+      cwd: ROOT,
+      env: { ...process.env, MAKEFUN_OUTPUT_DIR: outDir },
+      stdio: ['ignore', 'pipe', 'pipe'],
+      timeout: 60_000,
+    });
+    return { bytes: readFileSync(join(outDir, 'entry.png')) };
+  } catch (error) {
+    return { error: String(error.stderr ?? error.message).trim().split('\n').pop() };
+  }
 }
 
 function main() {
   const source = readFileSync(join(ROOT, 'entry.png'));
   const { header, problems } = checkImage(source);
-  const first = runEntry(join(ROOT, 'build', 'run1'));
-  const second = runEntry(join(ROOT, 'build', 'run2'));
+  const runs = [runEntry(join(ROOT, 'build', 'run1')), runEntry(join(ROOT, 'build', 'run2'))];
+  for (const run of runs) if (run.error) problems.push(`main.ts failed: ${run.error}`);
+  const [first, second] = runs.map((run) => run.bytes ?? Buffer.alloc(0));
   if (!first.equals(second)) problems.push('the two runs of main.ts wrote different bytes');
   if (!first.equals(source)) problems.push('main.ts output differs from entry.png');
   const report = {
