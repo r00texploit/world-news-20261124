@@ -7,7 +7,7 @@ import { dirname, join, resolve } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { deflateSync } from 'node:zlib';
-import { chunk, encodeRgb, PNG_SIGNATURE } from '../tools/png.mjs';
+import { chunk, encodePalette, encodeRgb, PNG_SIGNATURE } from '../tools/png.mjs';
 import { checkImage } from '../tools/verify.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -75,6 +75,10 @@ test('main.ts refuses malformed chunk streams and bad filter bytes', () => {
   assert.equal(runWithImage(handBuilt({ extra: [chunk('ABCD', Buffer.alloc(0))] })), false);
   assert.equal(runWithImage(handBuilt({ extra: [chunk('tEXt', Buffer.from('Title\0ok'))] })), true);
   assert.equal(runWithImage(handBuilt({ trailing: Buffer.from([1, 2, 3]) })), false);
+  const plte = chunk('PLTE', Buffer.from([1, 2, 3]));
+  assert.equal(runWithImage(handBuilt({ extra: [plte, plte] })), false);
+  const palette = encodePalette(2, 2, Buffer.from([0, 0, 0, 0]), Buffer.from([9, 9, 9]));
+  assert.equal(runWithImage(palette), false);
   assert.equal(checkImage(handBuilt({ trailing: Buffer.from([1, 2, 3]) })).problems.length > 0, true);
 });
 

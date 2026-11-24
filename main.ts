@@ -12,7 +12,8 @@ import { crc32, inflateSync } from 'node:zlib';
 const PNG_SIGNATURE: Buffer = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 const MAX_BYTES = 1048576;
 const MAX_SIDE = 1024;
-const CHANNELS: Record<number, number> = { 0: 1, 2: 3, 3: 1, 4: 2, 6: 4 };
+// greyscale, RGB, grey+alpha, RGBA: palette images are refused, since this build's encoder never writes one
+const CHANNELS: Record<number, number> = { 0: 1, 2: 3, 4: 2, 6: 4 };
 const KNOWN_CRITICAL = new Set(['IHDR', 'PLTE', 'IDAT', 'IEND']);
 
 interface PngParts {
@@ -44,6 +45,7 @@ function readParts(image: Buffer): PngParts {
     if ((header === null) !== (type === 'IHDR')) fail(header === null ? 'does not start with IHDR' : 'has a second IHDR');
     if (type[0] <= 'Z' && !KNOWN_CRITICAL.has(type)) fail(`unknown critical chunk ${type}`);
     if (type === 'IDAT' && idatState === 'after') fail('IDAT chunks are not consecutive');
+    if (type === 'PLTE' && (hasPalette || idatState !== 'before')) fail('PLTE is repeated or comes after IDAT');
     idatState = type === 'IDAT' ? 'inside' : idatState === 'inside' ? 'after' : idatState;
     const data = image.subarray(at + 8, end - 4);
     if (type === 'IHDR') header = data;
@@ -64,14 +66,13 @@ function readParts(image: Buffer): PngParts {
  */
 function assertGateLimits(image: Buffer): void {
   if (image.length > MAX_BYTES) fail(`${image.length} bytes, over ${MAX_BYTES}`);
-  const { header, idat, hasPalette } = readParts(image);
+  const { header, idat } = readParts(image);
   const width = header.readUInt32BE(0);
   const height = header.readUInt32BE(4);
   const channels = CHANNELS[header[9]];
   if (width < 1 || height < 1 || width > MAX_SIDE || height > MAX_SIDE) fail(`${width}x${height} pixels`);
   if (header[8] !== 8 || header[12] !== 0 || channels === undefined) fail('not an 8-bit non-interlaced PNG');
   if (header[10] !== 0 || header[11] !== 0) fail('unknown compression or filter method');
-  if (header[9] === 3 && !hasPalette) fail('palette image without PLTE');
   const stride = 1 + width * channels;
   const inflated = inflateSync(idat, { info: true }) as unknown as { buffer: Buffer; engine: { bytesWritten: number } };
   const rows = inflated.buffer;

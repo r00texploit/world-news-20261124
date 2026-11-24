@@ -39,6 +39,10 @@ export function readChunks(file) {
     const actual = crc32(file.subarray(at + 4, at + 8 + length));
     if (stored !== actual) throw new Error(`chunk ${type} has a bad CRC`);
     if (type === 'IHDR' && chunks.length > 0) throw new Error('a second IHDR chunk');
+    if (type === 'IHDR' && length !== 13) throw new Error(`IHDR is ${length} bytes, not 13`);
+    if (type === 'PLTE' && (idatState !== 'before' || chunks.some((c) => c.type === 'PLTE'))) {
+      throw new Error('PLTE is repeated or comes after IDAT');
+    }
     if (type[0] <= 'Z' && !['IHDR', 'PLTE', 'IDAT', 'IEND'].includes(type)) throw new Error(`unknown critical chunk ${type}`);
     if (type === 'IDAT' && idatState === 'after') throw new Error('IDAT chunks are not consecutive');
     idatState = type === 'IDAT' ? 'inside' : idatState === 'inside' ? 'after' : idatState;
