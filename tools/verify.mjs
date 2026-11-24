@@ -29,6 +29,7 @@ export function checkImage(bytes) {
   if (header && (header.width > MAX_SIDE || header.height > MAX_SIDE)) {
     problems.push(`${header.width}x${header.height} is larger than ${MAX_SIDE}x${MAX_SIDE}`);
   }
+  if (header && (header.width < 1 || header.height < 1)) problems.push(`${header.width}x${header.height} has no pixels`);
   if (bytes.length > MAX_BYTES) problems.push(`${bytes.length} bytes is over the ${MAX_BYTES}-byte cap`);
   return { header, problems };
 }
@@ -36,7 +37,8 @@ export function checkImage(bytes) {
 function runEntry(outDir) {
   rmSync(outDir, { recursive: true, force: true });
   mkdirSync(outDir, { recursive: true });
-  execFileSync(process.execPath, ['main.ts'], {
+  // the flag is a no-op on Node 22.18+, where type stripping is on by default, and needed on 22.6 to 22.17
+  execFileSync(process.execPath, ['--experimental-strip-types', 'main.ts'], {
     cwd: ROOT,
     env: { ...process.env, MAKEFUN_OUTPUT_DIR: outDir },
     stdio: ['ignore', 'pipe', 'pipe'],

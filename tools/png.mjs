@@ -104,6 +104,8 @@ export function decode(file) {
   if (!bpp) throw new Error(`colour type ${colorType} is invalid`);
   const palette = chunks.find((c) => c.type === 'PLTE')?.data;
   if (colorType === 3 && !palette) throw new Error('palette image without PLTE');
+  if (chunks.some((c) => c.type === 'tRNS')) throw new Error('tRNS transparency is not supported here');
+  if (width < 1 || height < 1) throw new Error(`image is ${width}x${height}`);
   const idat = Buffer.concat(chunks.filter((c) => c.type === 'IDAT').map((c) => c.data));
   const pixels = unfilter(inflateSync(idat), width, height, bpp);
   const rgb = Buffer.alloc(width * height * 3);

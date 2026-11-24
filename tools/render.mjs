@@ -5,7 +5,8 @@
 // The build needs no network: the page loads no remote resource and uses fonts installed on this machine.
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { decode, encodeRgb } from './png.mjs';
@@ -29,8 +30,16 @@ function findChrome() {
 }
 
 function screenshot(page, out) {
-  const profile = join(ROOT, 'build', 'chrome-profile');
-  mkdirSync(profile, { recursive: true });
+  // a fresh browser profile per render, so no cache or state from an earlier run can change the pixels
+  const profile = mkdtempSync(join(tmpdir(), 'entry-chrome-'));
+  try {
+    runChrome(profile, page, out);
+  } finally {
+    rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
+  }
+}
+
+function runChrome(profile, page, out) {
   execFileSync(findChrome(), [
     '--headless=new',
     '--disable-gpu',
