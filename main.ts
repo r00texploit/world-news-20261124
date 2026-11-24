@@ -46,6 +46,8 @@ function readParts(image: Buffer): PngParts {
     if (type[0] <= 'Z' && !KNOWN_CRITICAL.has(type)) fail(`unknown critical chunk ${type}`);
     if (type === 'IDAT' && idatState === 'after') fail('IDAT chunks are not consecutive');
     if (type === 'PLTE' && (hasPalette || idatState !== 'before')) fail('PLTE is repeated or comes after IDAT');
+    const size = end - at - 12;
+    if (type === 'PLTE' && (size < 3 || size > 768 || size % 3 !== 0)) fail(`PLTE of ${size} bytes is malformed`);
     idatState = type === 'IDAT' ? 'inside' : idatState === 'inside' ? 'after' : idatState;
     const data = image.subarray(at + 8, end - 4);
     if (type === 'IHDR') header = data;
