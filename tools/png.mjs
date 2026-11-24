@@ -118,6 +118,7 @@ export function decode(file) {
   if (palette && (palette.length % 3 !== 0 || palette.length < 3 || palette.length > 768)) {
     throw new Error(`PLTE of ${palette.length} bytes is malformed`);
   }
+  if (palette && (colorType === 0 || colorType === 4)) throw new Error('PLTE in a greyscale image');
   if (chunks.some((c) => c.type === 'tRNS')) throw new Error('tRNS transparency is not supported here');
   if (width < 1 || height < 1) throw new Error(`image is ${width}x${height}`);
   if (chunks[0].data[10] !== 0 || chunks[0].data[11] !== 0) throw new Error('unknown compression or filter method');
@@ -217,6 +218,8 @@ export function encodeRgb(width, height, rgb) {
 export function encodePalette(width, height, indices, paletteRgb) {
   if (indices.length !== width * height) throw new Error(`expected ${width * height} indices, got ${indices.length}`);
   if (paletteRgb.length % 3 !== 0 || paletteRgb.length < 3 || paletteRgb.length > 768) throw new Error('palette must hold 1 to 256 RGB entries');
+  const entries = paletteRgb.length / 3;
+  for (const index of indices) if (index >= entries) throw new Error(`palette index ${index} is past the ${entries}-entry palette`);
   const stride = width;
   const raw = Buffer.alloc(height * (stride + 1));
   for (let y = 0; y < height; y += 1) indices.copy(raw, y * (stride + 1) + 1, y * stride, (y + 1) * stride);

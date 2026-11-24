@@ -1,7 +1,8 @@
 // Unit tests for the PNG tools: run with  node --test
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { chunk, crc32, decode, encodePalette, encodeRgb, readChunks } from '../tools/png.mjs';
+import { deflateSync } from 'node:zlib';
+import { chunk, crc32, decode, encodePalette, encodeRgb, PNG_SIGNATURE, readChunks } from '../tools/png.mjs';
 import { downscale } from '../tools/preview.mjs';
 import { checkImage } from '../tools/verify.mjs';
 
@@ -41,6 +42,17 @@ test('a palette image survives encode then decode unchanged', () => {
   }
   const palette = Buffer.from([10, 20, 40, 200, 30, 30]);
   assert.deepEqual(decode(encodePalette(8, 4, indices, palette)).rgb, rgb);
+});
+
+test('encodePalette refuses an index past the end of the palette', () => {
+  assert.throws(() => encodePalette(2, 1, Buffer.from([0, 1]), Buffer.from([1, 2, 3])), /palette index 1/);
+});
+
+test('decode refuses a palette in a greyscale image', () => {
+  const ihdr = Buffer.from([0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 0, 0, 0]);
+  const parts = [chunk('IHDR', ihdr), chunk('PLTE', Buffer.from([1, 2, 3])), chunk('IDAT', deflateSync(Buffer.from([0, 77]))), chunk('IEND', Buffer.alloc(0))];
+  assert.throws(() => decode(Buffer.concat([PNG_SIGNATURE, ...parts])), /PLTE in a greyscale image/);
+  assert.equal(decode(Buffer.concat([PNG_SIGNATURE, parts[0], ...parts.slice(2)])).rgb[0], 77);
 });
 
 test('decode refuses a malformed palette and a tRNS chunk', () => {

@@ -58,10 +58,12 @@ test('main.ts accepts a small valid PNG and refuses corrupt, oversize or empty o
   assert.equal(runWithImage(good.subarray(0, good.length - 12)), false);
 });
 
-/** A 2x2 RGB PNG built chunk by chunk, so a test can break one part of it. */
-function handBuilt({ filter = 0, extra = [], iendData = Buffer.alloc(0), trailing = Buffer.alloc(0) } = {}) {
-  const ihdr = Buffer.from([0, 0, 0, 2, 0, 0, 0, 2, 8, 2, 0, 0, 0]);
-  const row = Buffer.from([filter, 10, 20, 30, 40, 50, 60]);
+const CHANNELS = { 0: 1, 2: 3, 4: 2 };
+
+/** A 2x2 PNG (RGB unless colourType says greyscale) built chunk by chunk, so a test can break one part of it. */
+function handBuilt({ filter = 0, colourType = 2, extra = [], iendData = Buffer.alloc(0), trailing = Buffer.alloc(0) } = {}) {
+  const ihdr = Buffer.from([0, 0, 0, 2, 0, 0, 0, 2, 8, colourType, 0, 0, 0]);
+  const row = Buffer.from([filter, ...Array.from({ length: 2 * CHANNELS[colourType] }, (_, i) => 10 * (i + 1))]);
   const idat = Buffer.concat([deflateSync(Buffer.concat([row, row])), trailing]);
   return Buffer.concat([PNG_SIGNATURE, chunk('IHDR', ihdr), ...extra, chunk('IDAT', idat), chunk('IEND', iendData)]);
 }
@@ -79,6 +81,10 @@ test('main.ts refuses malformed chunk streams and bad filter bytes', () => {
   assert.equal(runWithImage(handBuilt({ extra: [plte, plte] })), false);
   assert.equal(runWithImage(handBuilt({ extra: [plte] })), true);
   assert.equal(runWithImage(handBuilt({ extra: [chunk('PLTE', Buffer.from([1, 2, 3, 4]))] })), false);
+  for (const colourType of [0, 4]) {
+    assert.equal(runWithImage(handBuilt({ colourType })), true);
+    assert.equal(runWithImage(handBuilt({ colourType, extra: [plte] })), false);
+  }
   const palette = encodePalette(2, 2, Buffer.from([0, 0, 0, 0]), Buffer.from([9, 9, 9]));
   assert.equal(runWithImage(palette), false);
   assert.equal(checkImage(handBuilt({ trailing: Buffer.from([1, 2, 3]) })).problems.length > 0, true);

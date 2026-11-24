@@ -47,6 +47,7 @@ function readParts(image: Buffer): PngParts {
     if (type === 'PLTE' && (hasPalette || idatState !== 'before')) fail('PLTE is repeated or comes after IDAT');
     const size = end - at - 12;
     if (type === 'PLTE' && (size < 3 || size > 768 || size % 3 !== 0)) fail(`PLTE of ${size} bytes is malformed`);
+    if (type === 'PLTE' && (header?.[9] === 0 || header?.[9] === 4)) fail('PLTE in a greyscale image');
     idatState = type === 'IDAT' ? 'inside' : idatState === 'inside' ? 'after' : idatState;
     const data = image.subarray(at + 8, end - 4);
     if (type === 'IHDR') header = data;
