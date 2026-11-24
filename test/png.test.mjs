@@ -1,7 +1,7 @@
 // Unit tests for the PNG tools: run with  node --test
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { chunk, crc32, decode, encodePalette, encodeRgb, exactPalette, readChunks } from '../tools/png.mjs';
+import { chunk, crc32, decode, encodePalette, encodeRgb, readChunks } from '../tools/png.mjs';
 import { downscale } from '../tools/preview.mjs';
 import { checkImage } from '../tools/verify.mjs';
 
@@ -33,10 +33,13 @@ test('encoding is deterministic: equal pixels give equal bytes', () => {
 });
 
 test('a palette image survives encode then decode unchanged', () => {
-  const rgb = Buffer.alloc(8 * 4 * 3);
-  for (let i = 0; i < 32; i += 1) rgb.set(i % 3 === 0 ? [200, 30, 30] : [10, 20, 40], i * 3);
-  const { indices, palette } = exactPalette(rgb);
-  assert.equal(palette.length, 6);
+  const indices = Buffer.alloc(32);
+  const rgb = Buffer.alloc(32 * 3);
+  for (let i = 0; i < 32; i += 1) {
+    indices[i] = i % 3 === 0 ? 1 : 0;
+    rgb.set(i % 3 === 0 ? [200, 30, 30] : [10, 20, 40], i * 3);
+  }
+  const palette = Buffer.from([10, 20, 40, 200, 30, 30]);
   assert.deepEqual(decode(encodePalette(8, 4, indices, palette)).rgb, rgb);
 });
 
@@ -48,12 +51,6 @@ test('decode refuses a malformed palette and a tRNS chunk', () => {
   assert.throws(() => decode(rebuild(shortPalette)), /PLTE/);
   const withTrns = [parts[0], parts[1], { type: 'tRNS', data: Buffer.from([0]) }, ...parts.slice(2)];
   assert.throws(() => decode(rebuild(withTrns)), /tRNS/);
-});
-
-test('exactPalette gives up past 256 colours', () => {
-  const rgb = Buffer.alloc(300 * 3);
-  for (let i = 0; i < 300; i += 1) rgb.set([i & 0xff, i >> 8, 7], i * 3);
-  assert.equal(exactPalette(rgb), null);
 });
 
 test('readChunks rejects a bad signature, a bad CRC and a truncated file', () => {

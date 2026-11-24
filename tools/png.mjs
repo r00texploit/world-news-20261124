@@ -223,26 +223,3 @@ export function encodePalette(width, height, indices, paletteRgb) {
   const idat = deflateSync(raw, { level: 9, memLevel: 9 });
   return Buffer.concat([PNG_SIGNATURE, header(width, height, 3), chunk('PLTE', paletteRgb), chunk('IDAT', idat), chunk('IEND', Buffer.alloc(0))]);
 }
-
-/** Exact palette of an RGB image, or null when it has more than 256 colours. */
-export function exactPalette(rgb) {
-  const index = new Map();
-  const indices = Buffer.alloc(rgb.length / 3);
-  for (let i = 0; i < indices.length; i += 1) {
-    const key = (rgb[i * 3] << 16) | (rgb[i * 3 + 1] << 8) | rgb[i * 3 + 2];
-    let k = index.get(key);
-    if (k === undefined) {
-      if (index.size === 256) return null;
-      k = index.size;
-      index.set(key, k);
-    }
-    indices[i] = k;
-  }
-  const palette = Buffer.alloc(index.size * 3);
-  for (const [key, k] of index) {
-    palette[k * 3] = key >> 16;
-    palette[k * 3 + 1] = (key >> 8) & 0xff;
-    palette[k * 3 + 2] = key & 0xff;
-  }
-  return { indices, palette };
-}

@@ -19,7 +19,6 @@ const KNOWN_CRITICAL = new Set(['IHDR', 'PLTE', 'IDAT', 'IEND']);
 interface PngParts {
   header: Buffer;
   idat: Buffer;
-  hasPalette: boolean;
 }
 
 function fail(why: string): never {
@@ -58,7 +57,7 @@ function readParts(image: Buffer): PngParts {
   }
   if (type !== 'IEND' || at !== image.length) fail('does not end with IEND');
   if (header === null || header.length !== 13) fail('has no valid IHDR');
-  return { header, idat: Buffer.concat(idat), hasPalette };
+  return { header, idat: Buffer.concat(idat) };
 }
 
 /**
