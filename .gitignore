@@ -1,0 +1,11 @@
+.claude/
+.env
+*.tar.gz
+__pycache__/
+# local build and test output, never committed
+out/
+build/
+*.bundle
+transcripts*/
+makefun-run.json
+node_modules/

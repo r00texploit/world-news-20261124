@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The world on Tuesday 24 November 2026</title>
+<style>
+  :root {
+    --paper: #f3eee3;
+    --ink: #141a26;
+    --muted: #5b6170;
+    --navy: #101a30;
+    --gold: #f2c14e;
+    --gulf: #a16207;
+    --ukraine: #1d4ed8;
+    --health: #047857;
+    --world: #c2410c;
+    --space: #0e7490;
+    --china: #b91c1c;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1024px; height: 1024px; overflow: hidden; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    position: relative;
+  }
+  .serif { font-family: Georgia, 'Times New Roman', serif; }
+  .cond {
+    font-family: Bahnschrift, 'Arial Narrow', sans-serif;
+    font-stretch: 75%;
+    font-variation-settings: 'wdth' 75, 'wght' 600;
+    font-weight: 600;
+  }
+
+  /* masthead */
+  header {
+    position: absolute; left: 0; top: 0; width: 1024px; height: 112px;
+    background: var(--navy); color: #fff;
+    display: flex; align-items: center; padding: 0 24px; gap: 18px;
+  }
+  header .kicker {
+    font-size: 15px; letter-spacing: 3.2px; font-weight: 700; color: var(--gold);
+    text-transform: uppercase;
+  }
+  header h1 { font-size: 54px; line-height: 1.05; font-weight: 700; white-space: nowrap; margin-top: 2px; }
+  header .right {
+    margin-left: auto; text-align: right; font-size: 14px; line-height: 1.35; color: #c9d1e3;
+  }
+  header .right b { display: block; font-size: 30px; color: #fff; letter-spacing: 1px; }
+
+  /* lead */
+  .lead {
+    position: absolute; left: 20px; top: 124px; width: 984px; height: 300px;
+    background: #fffdf8; border: 1px solid #ddd3bf; border-top: 6px solid var(--china);
+    display: flex;
+  }
+  .lead .art { width: 440px; height: 293px; flex: none; }
+  .lead .txt { padding: 14px 22px 0 22px; display: flex; flex-direction: column; }
+  .tag {
+    display: inline-block; align-self: flex-start;
+    font-size: 13px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase;
+    color: #fff; padding: 3px 9px 3px 9px; border-radius: 3px;
+  }
+  .lead h2 { font-size: 40px; line-height: 1.07; font-weight: 700; margin-top: 6px; }
+  .lead p { font-size: 16px; line-height: 1.34; margin-top: 7px; color: #2b3140; }
+  .chips { display: flex; gap: 10px; margin-top: 9px; }
+  .chip {
+    flex: 1; border-left: 5px solid var(--china); background: #fbeaea;
+    padding: 5px 8px; font-size: 13px; line-height: 1.25; color: #3b1111;
+  }
+  .chip b { display: block; font-size: 20px; line-height: 1.05; color: var(--china); }
+  .src {
+    font-size: 10.5px; letter-spacing: 0.9px; text-transform: uppercase; color: var(--muted);
+    font-weight: 600;
+  }
+  .lead .src { margin-top: auto; padding-bottom: 9px; }
+
+  /* grid of stories */
+  .grid {
+    position: absolute; left: 20px; top: 436px; width: 984px; height: 532px;
+    display: grid; grid-template-columns: repeat(3, 320px); grid-template-rows: repeat(2, 260px);
+    column-gap: 12px; row-gap: 12px;
+  }
+  .card {
+    background: #fffdf8; border: 1px solid #ddd3bf; position: relative;
+    display: flex; flex-direction: column;
+  }
+  .card svg.art { width: 318px; height: 112px; display: block; }
+  .card .tag { position: absolute; left: 8px; top: 8px; }
+  .card .body { padding: 7px 10px 0 10px; display: flex; flex-direction: column; flex: 1; }
+  .card h3 { font-size: 23.5px; line-height: 1.04; }
+  .card p { font-size: 13.6px; line-height: 1.3; margin-top: 5px; color: #2b3140; }
+  .card .src { margin-top: auto; padding-bottom: 7px; }
+
+  .also { background: #1b2336; color: #f4f1ea; border-color: #1b2336; }
+  .also h3 { color: var(--gold); font-size: 22px; letter-spacing: 0.5px; padding: 10px 12px 4px 12px; }
+  .also ul { list-style: none; padding: 0 12px; }
+  .also li {
+    font-size: 13px; line-height: 1.26; padding: 4px 0 4px 0;
+    border-top: 1px solid #39435c;
+  }
+  .also li b { color: #fff; }
+  .also li span { color: #9fb0cc; font-size: 10.5px; letter-spacing: 0.6px; text-transform: uppercase; font-weight: 600; }
+
+  footer {
+    position: absolute; left: 20px; top: 976px; width: 984px; height: 40px;
+    font-size: 11.5px; line-height: 1.35; color: var(--muted);
+    border-top: 2px solid var(--ink); padding-top: 5px;
+    display: flex; justify-content: space-between; gap: 16px;
+  }
+  footer b { color: var(--ink); }
+</style>
+</head>
+<body>
+
+<header>
+  <svg width="70" height="70" viewBox="0 0 70 70" aria-hidden="true">
+    <circle cx="35" cy="35" r="31" fill="#1f6fb2"/>
+    <path d="M14 22c6-3 10 1 15-1s5-7 11-6 7 6 3 10-9 1-11 6 4 9-1 13-9 1-11-4-9-4-10-10z" fill="#5fbf7a"/>
+    <path d="M44 41c4-2 9 0 10 4s-3 9-7 9-6-3-6-6 0-5 3-7z" fill="#5fbf7a"/>
+    <ellipse cx="35" cy="35" rx="31" ry="12" fill="none" stroke="#f2c14e" stroke-width="2.5"/>
+    <circle cx="35" cy="35" r="31" fill="none" stroke="#fff" stroke-width="2.5"/>
+  </svg>
+  <div>
+    <div class="kicker">The world in one page · day digest</div>
+    <h1 class="serif">Tuesday 24 November 2026</h1>
+  </div>
+</header>
+
+<section class="lead">
+  <svg class="art" viewBox="0 0 440 293" aria-hidden="true">
+    <defs>
+      <linearGradient id="dusk" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#5b0f12"/>
+        <stop offset="0.55" stop-color="#b3261e"/>
+        <stop offset="1" stop-color="#f08a3c"/>
+      </linearGradient>
+      <linearGradient id="river" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#2a1a2e"/>
+        <stop offset="1" stop-color="#120d1c"/>
+      </linearGradient>
+    </defs>
+    <rect width="440" height="293" fill="url(#dusk)"/>
+    <!-- river -->
+    <rect y="232" width="440" height="61" fill="url(#river)"/>
+    <!-- skyline: Shanghai Tower, Jin Mao, World Financial Center, Pearl Tower -->
+    <g fill="#141024">
+      <path d="M170 232 L176 70 Q182 56 190 52 L194 232 Z"/>
+      <path d="M206 232 L206 120 L210 120 L210 104 L214 104 L214 90 L217 74 L220 90 L220 104 L224 104 L224 120 L228 120 L228 232 Z"/>
+      <path d="M236 232 L240 78 L262 78 L266 232 Z"/>
+      <path d="M58 232 L58 182 L84 182 L84 232 Z"/>
+      <path d="M90 232 L90 160 L110 160 L110 232 Z"/>
+      <path d="M276 232 L276 150 L300 150 L300 232 Z"/>
+      <path d="M304 232 L304 176 L330 176 L330 232 Z"/>
+      <path d="M336 232 L336 140 L352 140 L352 232 Z"/>
+      <path d="M356 232 L356 188 L392 188 L392 232 Z"/>
+      <path d="M396 232 L396 166 L414 166 L414 232 Z"/>
+      <path d="M18 232 L18 196 L52 196 L52 232 Z"/>
+      <!-- Pearl Tower -->
+      <path d="M120 232 L134 172 L138 172 L128 232 Z"/>
+      <path d="M156 232 L146 172 L150 172 L164 232 Z"/>
+      <rect x="138" y="96" width="8" height="140"/>
+      <circle cx="142" cy="168" r="17"/>
+      <circle cx="142" cy="108" r="11"/>
+      <rect x="140.5" y="40" width="3" height="58"/>
+    </g>
+    <!-- Shanghai Tower twist and WFC aperture as sky cut-outs -->
+    <path d="M183 66 Q187 140 191 232" stroke="#b3261e" stroke-width="1.5" fill="none" opacity="0.6"/>
+    <path d="M244 90 L258 90 L258 96 L244 96 Z" fill="#c9462a"/>
+    <!-- lit windows -->
+    <g fill="#f6c76b" opacity="0.85">
+      <rect x="62" y="190" width="4" height="4"/><rect x="72" y="200" width="4" height="4"/>
+      <rect x="94" y="170" width="4" height="4"/><rect x="100" y="184" width="4" height="4"/>
+      <rect x="280" y="160" width="4" height="4"/><rect x="290" y="176" width="4" height="4"/>
+      <rect x="310" y="186" width="4" height="4"/><rect x="340" y="150" width="4" height="4"/>
+      <rect x="362" y="198" width="4" height="4"/><rect x="400" y="176" width="4" height="4"/>
+      <rect x="24" y="206" width="4" height="4"/><rect x="214" y="140" width="4" height="4"/>
+      <rect x="248" y="120" width="4" height="4"/><rect x="250" y="150" width="4" height="4"/>
+    </g>
+    <!-- reflections -->
+    <g stroke="#f08a3c" stroke-width="2" opacity="0.5">
+      <line x1="134" y1="246" x2="152" y2="246"/><line x1="172" y1="256" x2="196" y2="256"/>
+      <line x1="236" y1="250" x2="262" y2="250"/><line x1="60" y1="262" x2="90" y2="262"/>
+      <line x1="300" y1="266" x2="340" y2="266"/><line x1="140" y1="276" x2="150" y2="276"/>
+    </g>
+    <!-- magnifying glass over the skyline -->
+    <g transform="translate(250 112)">
+      <line x1="62" y1="62" x2="128" y2="128" stroke="#0b0b12" stroke-width="22" stroke-linecap="round"/>
+      <line x1="62" y1="62" x2="128" y2="128" stroke="#3a2a1a" stroke-width="14" stroke-linecap="round"/>
+      <circle cx="0" cy="0" r="78" fill="#fff4d6" fill-opacity="0.22" stroke="#f2c14e" stroke-width="13"/>
+      <circle cx="0" cy="0" r="78" fill="none" stroke="#8a5a00" stroke-width="2"/>
+      <path d="M-46 -40 A60 60 0 0 1 -6 -62" stroke="#fff" stroke-width="7" fill="none" stroke-linecap="round" opacity="0.75"/>
+    </g>
+    <text x="18" y="282" fill="#f6dcc0" font-family="Segoe UI, Arial" font-size="13" font-weight="700" letter-spacing="3">SHANGHAI</text>
+  </svg>
+  <div class="txt">
+    <span class="tag" style="background:var(--china)">Lead · China</span>
+    <h2 class="serif">China opens probe into Shanghai’s party chief</h2>
+    <p>Politburo member <b>Chen Jining</b>, 62, is suspected of “serious violations of discipline and law”, state media said on Tuesday. He has run China’s biggest city since 2022.</p>
+    <div class="chips">
+      <div class="chip"><b>4th</b>Politburo member probed since 2022</div>
+      <div class="chip"><b>1st</b>Shanghai party chief probed since 2006</div>
+    </div>
+    <div class="src">Sources: Xinhua via AP · SCMP · Bloomberg · Lianhe Zaobao</div>
+  </div>
+</section>
+
+<main class="grid">
+
+  <article class="card">
+    <svg class="art" viewBox="0 0 318 112" aria-hidden="true">
+      <rect width="318" height="112" fill="#f4e2c8"/>
+      <!-- Riyadh: a slant-crowned skyscraper with smoke at its upper floors, an arch-topped tower beside it -->
+      <rect y="100" width="170" height="12" fill="#c9a77c"/>
+      <g fill="#5a3a20">
+        <path d="M20 100 L20 70 L36 70 L36 100 Z"/>
+        <path d="M58 100 L62 30 L72 18 L82 34 L84 100 Z"/>
+        <path d="M100 100 L104 46 Q114 22 124 46 L128 100 Z"/>
+        <path d="M138 100 L138 64 L158 64 L158 100 Z"/>
+      </g>
+      <path d="M108 46 Q114 34 120 46 L119 56 L109 56 Z" fill="#f4e2c8"/>
+      <g fill="#f6c76b"><rect x="66" y="50" width="4" height="4"/><rect x="74" y="66" width="4" height="4"/><rect x="66" y="82" width="4" height="4"/></g>
+      <path d="M80 40 L86 36 L84 42 L90 43 L84 46 L86 52 L80 47 L76 52 L77 45 L72 43 L78 41 Z" fill="#f97316"/>
+      <g fill="#8a8178" opacity="0.85"><circle cx="92" cy="30" r="9"/><circle cx="102" cy="22" r="7"/><circle cx="110" cy="28" r="5"/></g>
+      <!-- Gulf water with a burning tanker -->
+      <rect x="176" y="84" width="142" height="28" fill="#3f7fae"/>
+      <path d="M190 84 L286 84 L278 96 L196 96 Z" fill="#2a2f3a"/>
+      <rect x="264" y="70" width="14" height="14" fill="#2a2f3a"/>
+      <path d="M204 84 Q200 70 208 62 Q210 72 216 74 Q216 66 222 60 Q226 74 220 84 Z" fill="#f97316"/>
+      <text x="306" y="36" text-anchor="end" font-family="Bahnschrift, Arial Narrow" font-size="32" font-weight="700" fill="#b45309">11 hurt</text>
+      <text x="306" y="52" text-anchor="end" font-family="Segoe UI, Arial" font-size="12" font-weight="600" fill="#5a3a20">Riyadh financial district</text>
+      <text x="312" y="108" text-anchor="end" font-family="Segoe UI, Arial" font-size="11" font-weight="700" fill="#ffffff">Iran: 4 tankers hit mines</text>
+    </svg>
+    <span class="tag" style="background:var(--gulf)">Middle East · Gulf</span>
+    <div class="body">
+      <h3 class="cond">Strike hits tower in Riyadh’s financial district</h3>
+      <p>Witnesses say it was the PIF skyscraper, hit for a second time in a week; Saudi civil defence blames the Houthis.</p>
+      <div class="src">Arab News · AFP via Al Jazeera · Anadolu</div>
+    </div>
+  </article>
+
+  <article class="card">
+    <svg class="art" viewBox="0 0 318 112" aria-hidden="true">
+      <rect width="318" height="112" fill="#dbe6fa"/>
+      <!-- smoke -->
+      <g fill="#8d95a6" opacity="0.8">
+        <circle cx="120" cy="30" r="16"/><circle cx="138" cy="20" r="13"/><circle cx="104" cy="22" r="11"/>
+        <circle cx="152" cy="34" r="10"/>
+      </g>
+      <!-- five-storey block, right side torn open -->
+      <path d="M30 112 L30 40 L124 40 L130 54 L118 64 L132 78 L120 92 L134 112 Z" fill="#c9cdd6" stroke="#4a5266" stroke-width="2"/>
+      <g fill="#3d4a66">
+        <rect x="40" y="48" width="12" height="9"/><rect x="62" y="48" width="12" height="9"/><rect x="84" y="48" width="12" height="9"/>
+        <rect x="40" y="64" width="12" height="9"/><rect x="62" y="64" width="12" height="9"/><rect x="84" y="64" width="12" height="9"/>
+        <rect x="40" y="80" width="12" height="9"/><rect x="62" y="80" width="12" height="9"/>
+        <rect x="40" y="96" width="12" height="9"/><rect x="62" y="96" width="12" height="9"/><rect x="84" y="96" width="12" height="9"/>
+      </g>
+      <g fill="#f4a63a"><rect x="84" y="80" width="12" height="9"/><rect x="106" y="64" width="9" height="9"/></g>
+      <path d="M128 112 L140 96 L152 104 L166 92 L178 112 Z" fill="#7b8396"/>
+      <rect x="0" y="108" width="318" height="4" fill="#4a5266"/>
+      <text x="304" y="54" text-anchor="end" font-family="Bahnschrift, Arial Narrow" font-size="34" font-weight="700" fill="#1d4ed8">2 killed</text>
+      <text x="304" y="86" text-anchor="end" font-family="Bahnschrift, Arial Narrow" font-size="28" font-weight="700" fill="#16306e">40+ hurt</text>
+      <text x="304" y="102" text-anchor="end" font-family="Segoe UI, Arial" font-size="12" font-weight="600" fill="#16306e">incl. 4 children</text>
+    </svg>
+    <span class="tag" style="background:var(--ukraine)">Europe · Ukraine</span>
+    <div class="body">
+      <h3 class="cond">Russian strike on Zaporizhzhia hits homes overnight</h3>
+      <p>A five-storey block is partly destroyed. Kyiv calls its weekend strike on Russian ships off Libya self-defence.</p>
+      <div class="src">AP · Kyiv Post · Interfax-Ukraine</div>
+    </div>
+  </article>
+
+  <article class="card">
+    <svg class="art" viewBox="0 0 318 112" aria-hidden="true">
+      <rect width="318" height="112" fill="#d7f0e3"/>
+      <!-- vial -->
+      <rect x="34" y="16" width="34" height="14" rx="3" fill="#2f5f4c"/>
+      <path d="M38 30 L64 30 L64 98 Q64 104 58 104 L44 104 Q38 104 38 98 Z" fill="#eefaf4" stroke="#2f5f4c" stroke-width="2.5"/>
+      <path d="M40 60 L62 60 L62 98 Q62 102 58 102 L44 102 Q40 102 40 98 Z" fill="#2fa36b"/>
+      <rect x="44" y="40" width="14" height="10" fill="#fff" stroke="#2f5f4c" stroke-width="1"/>
+      <!-- syringe -->
+      <g transform="translate(84 92) rotate(-40)">
+        <rect x="0" y="-7" width="62" height="14" rx="2" fill="#f7fbf9" stroke="#2f5f4c" stroke-width="2"/>
+        <rect x="4" y="-5" width="30" height="10" fill="#7fd1a8"/>
+        <rect x="62" y="-2" width="22" height="4" fill="#6b7a74"/>
+        <rect x="-10" y="-10" width="10" height="20" fill="#2f5f4c"/>
+      </g>
+      <!-- filament virus, shepherd's-crook shape -->
+      <path d="M150 96 C150 60 152 40 166 28 C180 16 200 22 200 40 C200 54 186 58 178 50" stroke="#9b2c4a" stroke-width="9" fill="none" stroke-linecap="round"/>
+      <path d="M150 96 C150 60 152 40 166 28 C180 16 200 22 200 40 C200 54 186 58 178 50" stroke="#e3809b" stroke-width="3" fill="none" stroke-dasharray="3 5" stroke-linecap="round"/>
+      <text x="306" y="62" text-anchor="end" font-family="Bahnschrift, Arial Narrow" font-size="44" font-weight="700" fill="#047857">1.5M</text>
+      <text x="306" y="84" text-anchor="end" font-family="Segoe UI, Arial" font-size="13" font-weight="700" fill="#0b3d2c">doses, if trials succeed</text>
+    </svg>
+    <span class="tag" style="background:var(--health)">Africa · Health</span>
+    <div class="body">
+      <h3 class="cond">Gavi secures access to a trial Ebola vaccine for DR Congo</h3>
+      <p>Advance deal for a Bundibugyo shot from Serum Institute and Oxford; the outbreak has killed more than 5,700.</p>
+      <div class="src">Gavi, the Vaccine Alliance (Geneva)</div>
+    </div>
+  </article>
+
+  <article class="card">
+    <svg class="art" viewBox="0 0 318 112" aria-hidden="true">
+      <rect width="318" height="112" fill="#fde9d7"/>
+      <!-- a clock face with five orange marks: five killings every hour -->
+      <circle cx="78" cy="71" r="34" fill="#fff" stroke="#7c2d12" stroke-width="3"/>
+      <g stroke="#7c2d12" stroke-width="2">
+        <line x1="78" y1="40" x2="78" y2="45"/><line x1="109" y1="71" x2="104" y2="71"/>
+        <line x1="78" y1="102" x2="78" y2="97"/><line x1="47" y1="71" x2="52" y2="71"/>
+      </g>
+      <g fill="#ea580c">
+        <circle cx="78" cy="46" r="4.5"/><circle cx="101.8" cy="63.3" r="4.5"/><circle cx="92.7" cy="91.2" r="4.5"/>
+        <circle cx="63.3" cy="91.2" r="4.5"/><circle cx="54.2" cy="63.3" r="4.5"/>
+      </g>
+      <line x1="78" y1="71" x2="78" y2="54" stroke="#1f2937" stroke-width="3" stroke-linecap="round"/>
+      <line x1="78" y1="71" x2="91" y2="77" stroke="#1f2937" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="78" cy="71" r="3" fill="#1f2937"/>
+      <text x="306" y="68" text-anchor="end" font-family="Bahnschrift, Arial Narrow" font-size="42" font-weight="700" fill="#c2410c">47,000</text>
+      <text x="306" y="86" text-anchor="end" font-family="Segoe UI, Arial" font-size="12.5" font-weight="700" fill="#5a2208">women and girls killed</text>
+      <text x="306" y="102" text-anchor="end" font-family="Segoe UI, Arial" font-size="12.5" font-weight="700" fill="#5a2208">by partners or family, 2025</text>
+    </svg>
+    <span class="tag" style="background:var(--world)">World · UN report</span>
+    <div class="body">
+      <h3 class="cond">UN: five women an hour killed by partners or relatives</h3>
+      <p>Such killings were 60% of all femicides last year, a UNODC and UN Women brief finds; Africa has the highest rate.</p>
+      <div class="src">UNODC · UN News · DW</div>
+    </div>
+  </article>
+
+  <article class="card">
+    <svg class="art" viewBox="0 0 318 112" aria-hidden="true">
+      <defs>
+        <radialGradient id="qso" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0" stop-color="#fff2d0"/>
+          <stop offset="0.25" stop-color="#ff6a3d"/>
+          <stop offset="0.6" stop-color="#b3122c" stop-opacity="0.55"/>
+          <stop offset="1" stop-color="#b3122c" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="318" height="112" fill="#0a1024"/>
+      <g fill="#dfe8ff">
+        <circle cx="12" cy="14" r="1"/><circle cx="40" cy="80" r="1.2"/><circle cx="64" cy="22" r="0.8"/>
+        <circle cx="88" cy="96" r="1"/><circle cx="118" cy="10" r="1.2"/><circle cx="150" cy="60" r="0.8"/>
+        <circle cx="176" cy="18" r="1"/><circle cx="200" cy="100" r="1"/><circle cx="226" cy="36" r="0.8"/>
+        <circle cx="262" cy="76" r="1.2"/><circle cx="290" cy="20" r="1"/><circle cx="306" cy="70" r="0.8"/>
+        <circle cx="20" cy="50" r="0.8"/><circle cx="132" cy="104" r="1"/>
+      </g>
+      <!-- quasar: bright core with jets -->
+      <line x1="30" y1="50" x2="78" y2="98" stroke="#ff9b6a" stroke-width="2" opacity="0.7"/>
+      <circle cx="54" cy="74" r="30" fill="url(#qso)"/>
+      <circle cx="54" cy="74" r="4" fill="#fff6e0"/>
+      <!-- Euclid spacecraft: sunshield panel, telescope body and service module -->
+      <g transform="translate(110 40)">
+        <rect x="0" y="0" width="10" height="50" fill="#2b4a8b" stroke="#9fb7e8" stroke-width="1.5"/>
+        <rect x="10" y="9" width="30" height="30" rx="3" fill="#d9dde6"/>
+        <circle cx="40" cy="24" r="9" fill="#d9dde6"/>
+        <rect x="15" y="40" width="20" height="9" fill="#c79a3a"/>
+      </g>
+      <path d="M100 64 L80 72" stroke="#ffd27a" stroke-width="1.5" stroke-dasharray="3 3"/>
+      <text x="306" y="44" text-anchor="end" font-family="Bahnschrift, Arial Narrow" font-size="32" font-weight="700" fill="#ffd27a">630M yrs</text>
+      <text x="306" y="62" text-anchor="end" font-family="Segoe UI, Arial" font-size="12" font-weight="600" fill="#dfe8ff">after the Big Bang</text>
+      <text x="306" y="98" text-anchor="end" font-family="Segoe UI, Arial" font-size="12" font-weight="600" fill="#9fb7e8">redshift 8.13</text>
+    </svg>
+    <span class="tag" style="background:var(--space)">Space · Science</span>
+    <div class="body">
+      <h3 class="cond">ESA’s Euclid finds the most distant quasar yet</h3>
+      <p>Object J1504+6252 is powered by a black hole of about 360 million suns, ESA says; paper out Tuesday.</p>
+      <div class="src">ESA · Astronomy &amp; Astrophysics · AP</div>
+    </div>
+  </article>
+
+  <article class="card also">
+    <h3 class="cond">Also on 24 November</h3>
+    <ul>
+      <li><b>Gaza</b>: Israeli strike kills Hamas’s internal-security chief <span>· BBC · Times of Israel</span></li>
+      <li><b>Bangladesh</b>: police fire tear gas at garment wage protests; dozens of factories shut <span>· Reuters</span></li>
+      <li><b>Japan</b> to pay its 2027 ICC dues early amid US sanctions <span>· NHK · Asahi</span></li>
+      <li><b>UK</b>: MI5 and MoD warn Ukraine’s suppliers of Russian sabotage <span>· MI5 · AP</span></li>
+      <li><b>Brazil</b>: Lula backs a second spending-curb plan, a source says <span>· Reuters</span></li>
+    </ul>
+  </article>
+
+</main>
+
+<footer>
+  <div><b>Compiled 24 Nov 2026, 16:00 UTC</b> from published reports; figures as reported by officials and agencies.</div>
+  <div>Illustrations are original drawings, not photographs.</div>
+</footer>
+
+</body>
+</html>
